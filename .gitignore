@@ -32,3 +32,11 @@ Makefile*
 #QtCtreator Qml
 *.qmlproject.user
 *.qmlproject.user.*
+
+# QtCreator and cmake
+CMakeLists.txt.user
+CMakeLists.txt.user.*
+
+# output
+lib/
+bin/

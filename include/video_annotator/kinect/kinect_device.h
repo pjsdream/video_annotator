@@ -12,7 +12,7 @@
 namespace video_annotator
 {
 
-/** 640 x 480 resolution Kinect
+/** 640 x 480 resolution Kinect device
  */
 class KinectDevice : public Freenect::FreenectDevice
 {
@@ -20,7 +20,7 @@ public:
 
     KinectDevice(freenect_context *ctx, int index);
 
-    /** to convert from image space (i,j,d) to 3d space (x,y,z),
+    /* to convert from image space (i,j,d) to 3d space (x,y,z),
      * (from https://openkinect.org/wiki/Imaging_Information)
      *
      * x = (i - w / 2) * (z + minDistance) * scaleFactor
@@ -30,6 +30,13 @@ public:
      * minDistance = -10
      * scaleFactor = .0021.
      * These values were found by hand.
+     */
+
+    /* 640*480 resolution, r(1) g(1) b(1) d(2)
+     * 1.46MB/frame
+     * 15fps => 22.0MB/s
+     * 30fps => 43.9MB/s
+     * Typical SSD data transfer rate = 100~600MB/s
      */
 
     // Do not call directly even in child
@@ -43,12 +50,12 @@ public:
 
 private:
 
-    std::vector<uint8_t> m_buffer_video;
-    std::vector<uint16_t> m_buffer_depth;
-    Mutex m_rgb_mutex;
-    Mutex m_depth_mutex;
-    bool m_new_rgb_frame;
-    bool m_new_depth_frame;
+    std::vector<uint8_t> buffer_video_;
+    std::vector<uint16_t> buffer_depth_;
+    Mutex rgb_mutex_;
+    Mutex depth_mutex_;
+    bool new_rgb_frame_;
+    bool new_depth_frame_;
 };
 
 }

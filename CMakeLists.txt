@@ -1,8 +1,6 @@
 project(video_annotator)
 cmake_minimum_required(VERSION 2.8)
 
-set(CMAKE_PREFIX_PATH /playpen/jaesungp/Qt/5.6/gcc_64)
-
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 include_directories(${PROJECT_SOURCE_DIR}/include)
@@ -36,8 +34,11 @@ find_package(OpenGL REQUIRED)
 find_package(GLUT REQUIRED)
 
 # Qt5
+# locate Qt5 installed directory
+set(CMAKE_PREFIX_PATH /playpen/jaesungp/Qt/5.6/gcc_64)
 # Instruct CMake to run moc automatically when needed.
 set(CMAKE_AUTOMOC ON)
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
 # Find the QtWidgets library
 find_package(Qt5Widgets REQUIRED)
 find_package(Qt5Core REQUIRED)
@@ -47,13 +48,17 @@ find_package(Qt5OpenGL REQUIRED)
 # SOURCES
 set(HEADERS
     include/video_annotator/kinect/kinect_device.h
-    include/video_annotator/interface/visualizer.h
+    include/video_annotator/interface/viewer.h
+    include/video_annotator/interface/kinect_viewer.h
+    include/video_annotator/interface/opengl_widget.h
     include/video_annotator/util/mutex.h
 )
 
 set(SOURCES
     src/kinect/kinect_device.cpp
-    src/interface/visualizer.cpp
+    src/interface/viewer.cpp
+    src/interface/kinect_viewer.cpp
+    src/interface/opengl_widget.cpp
 )
 
 add_library(video_annotator

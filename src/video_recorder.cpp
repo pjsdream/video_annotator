@@ -1,5 +1,5 @@
 #include <QApplication>
-#include <video_annotator/interface/visualizer.h>
+#include <video_annotator/interface/kinect_viewer.h>
 
 int main(int argc, char** argv)
 {
@@ -10,7 +10,7 @@ int main(int argc, char** argv)
     printf("complete\n"); fflush(stdout);
 
     QApplication a(argc, argv);
-    video_annotator::KinectVideoWidget* widget = new video_annotator::KinectVideoWidget(device);
+    video_annotator::KinectViewerWidget* widget = new video_annotator::KinectViewerWidget(30);
     widget->show();
 
     a.exec();

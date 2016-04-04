@@ -52,6 +52,7 @@ set(HEADERS
     include/video_annotator/interface/kinect_viewer.h
     include/video_annotator/interface/opengl_widget.h
     include/video_annotator/util/mutex.h
+    include/video_annotator/util/time.h
 )
 
 set(SOURCES

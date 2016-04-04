@@ -25,7 +25,7 @@
  */
 
 
-#include "libfreenect.hpp"
+#include <libfreenect.hpp>
 #include <pthread.h>
 #include <stdio.h>
 #include <iostream>
@@ -42,6 +42,8 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 #endif
+
+#include <video_annotator/util/time.h>
 
 
 class Mutex {
@@ -184,6 +186,12 @@ char **g_argv;
 
 void DrawGLScene()
 {
+    static double last_time = 0;
+    double current_time = video_annotator::time();
+    printf("\ntime interval: %lf", (current_time - last_time) * 1000.0);
+    fflush(stdout);
+    last_time = current_time;
+
     static std::vector<uint8_t> depth(640*480*4);
     static std::vector<uint8_t> rgb(640*480*4);
 
@@ -192,13 +200,13 @@ void DrawGLScene()
         freenect_angle = device->getState().getTiltDegs();
     }*/
     device->updateState();
+    /*
     printf("\r demanded tilt angle: %+4.2f device tilt angle: %+4.2f", freenect_angle, device->getState().getTiltDegs());
     fflush(stdout);
+    */
 
     device->getDepth(depth);
     device->getRGB(rgb);
-
-    got_frames = 0;
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
@@ -230,7 +238,7 @@ void DrawGLScene()
     glTexCoord2f(0, 1); glVertex3f(640,480,0);
     glEnd();
 
-    glutSwapBuffers();
+    //glutSwapBuffers();
 }
 
 void keyPressed(unsigned char key, int x, int y)

@@ -9,7 +9,7 @@ OpenGLWidget::OpenGLWidget(QWidget* parent)
     QSurfaceFormat format;
     format.setVersion(4, 3);
     format.setDepthBufferSize(24);
-    format.setProfile(QSurfaceFormat::CoreProfile);
+    format.setProfile(QSurfaceFormat::CompatibilityProfile);
     setFormat(format);
 }
 

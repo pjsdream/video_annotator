@@ -17,6 +17,7 @@ InteractiveViewerWidget::InteractiveViewerWidget(int fps, QWidget *parent)
     QTimer* timer = new QTimer(this);
     timer->setInterval(1.0 / fps_);
     connect(timer, SIGNAL(timeout()), this, SLOT(update()));
+    timer->start();
 }
 
 }

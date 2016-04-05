@@ -95,7 +95,7 @@ public:
         uint8_t* rgb = static_cast<uint8_t*>(_rgb);
         std::copy(rgb, rgb+getVideoBufferSize(), m_buffer_video.begin());
         m_new_rgb_frame = true;
-    };
+    }
     // Do not call directly even in child
     void DepthCallback(void* _depth, uint32_t timestamp) {
         Mutex::ScopedLock lock(m_depth_mutex);
@@ -186,12 +186,6 @@ char **g_argv;
 
 void DrawGLScene()
 {
-    static double last_time = 0;
-    double current_time = video_annotator::time();
-    printf("\ntime interval: %lf", (current_time - last_time) * 1000.0);
-    fflush(stdout);
-    last_time = current_time;
-
     static std::vector<uint8_t> depth(640*480*4);
     static std::vector<uint8_t> rgb(640*480*4);
 
@@ -238,7 +232,7 @@ void DrawGLScene()
     glTexCoord2f(0, 1); glVertex3f(640,480,0);
     glEnd();
 
-    //glutSwapBuffers();
+    glutSwapBuffers();
 }
 
 void keyPressed(unsigned char key, int x, int y)

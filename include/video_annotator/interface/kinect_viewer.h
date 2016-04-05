@@ -15,8 +15,8 @@ class KinectViewerWidget : public InteractiveViewerWidget
 
 public:
 
-    KinectViewerWidget(QWidget* parent = 0);
-    KinectViewerWidget(int fps, QWidget* parent = 0);
+    KinectViewerWidget(KinectDevice* device, QWidget* parent = 0);
+    KinectViewerWidget(int fps, KinectDevice* device, QWidget* parent = 0);
 
 protected:
 
@@ -26,6 +26,9 @@ protected:
 
 private:
 
+    KinectDevice* device_;
+    GLuint gl_depth_tex_;
+    GLuint gl_rgb_tex_;
 };
 
 }

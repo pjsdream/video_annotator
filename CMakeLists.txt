@@ -50,6 +50,7 @@ set(HEADERS
     include/video_annotator/kinect/kinect_device.h
     include/video_annotator/interface/viewer.h
     include/video_annotator/interface/kinect_viewer.h
+    include/video_annotator/interface/kinect_recorder.h
     include/video_annotator/interface/opengl_widget.h
     include/video_annotator/util/mutex.h
     include/video_annotator/util/time.h
@@ -59,6 +60,7 @@ set(SOURCES
     src/kinect/kinect_device.cpp
     src/interface/viewer.cpp
     src/interface/kinect_viewer.cpp
+    src/interface/kinect_recorder.cpp
     src/interface/opengl_widget.cpp
 )
 

@@ -7,6 +7,8 @@
 #include <video_annotator/util/mutex.h>
 
 #include <vector>
+#include <string>
+#include <stdio.h>
 
 
 namespace video_annotator
@@ -40,22 +42,32 @@ public:
      */
 
     // Do not call directly even in child
-    void VideoCallback(void* rgb, uint32_t timestamp);
+    virtual void VideoCallback(void* rgb, uint32_t timestamp);
 
     // Do not call directly even in child
-    void DepthCallback(void* depth, uint32_t timestamp);
+    virtual void DepthCallback(void* depth, uint32_t timestamp);
 
     // depth is in mm
-    bool getRGBD(std::vector<uint8_t> &rgb, std::vector<uint16_t> &depth);
+    bool getRGBD(std::vector<uint8_t> &rgb, std::vector<uint16_t> &depth) const;
+
+    void startRecord(const std::string& filename);
+    void finishRecord();
 
 private:
 
+    static void* staticRecord(void* object);
+    void record();
+
     std::vector<uint8_t> buffer_video_;
     std::vector<uint16_t> buffer_depth_;
-    Mutex rgb_mutex_;
-    Mutex depth_mutex_;
+    mutable Mutex rgb_mutex_;
+    mutable Mutex depth_mutex_;
     bool new_rgb_frame_;
     bool new_depth_frame_;
+
+    FILE* file_rgbd_;
+    pthread_t record_thread_;
+    bool recording_;
 };
 
 }

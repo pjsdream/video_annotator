@@ -1,7 +1,5 @@
 #include <video_annotator/interface/viewer.h>
 
-#include <QTimer>
-
 namespace video_annotator
 {
 
@@ -13,11 +11,21 @@ InteractiveViewerWidget::InteractiveViewerWidget(QWidget *parent)
 InteractiveViewerWidget::InteractiveViewerWidget(int fps, QWidget *parent)
     : OpenGLWidget(parent)
     , fps_(fps)
+    , timer_(new QTimer(this))
 {
-    QTimer* timer = new QTimer(this);
-    timer->setInterval(1.0 / fps_);
-    connect(timer, SIGNAL(timeout()), this, SLOT(update()));
-    timer->start();
+    timer_->setInterval(1.0 / fps_);
+    connect(timer_, SIGNAL(timeout()), this, SLOT(update()));
+    timer_->start();
+}
+
+void InteractiveViewerWidget::pause()
+{
+    timer_->blockSignals(true);
+}
+
+void InteractiveViewerWidget::resume()
+{
+    timer_->blockSignals(false);
 }
 
 }

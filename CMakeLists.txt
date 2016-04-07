@@ -51,7 +51,9 @@ set(HEADERS
     include/video_annotator/interface/viewer.h
     include/video_annotator/interface/kinect_viewer.h
     include/video_annotator/interface/kinect_recorder.h
+    include/video_annotator/interface/video_annotator.h
     include/video_annotator/interface/opengl_widget.h
+    include/video_annotator/data/rgbd_frames.h
     include/video_annotator/util/mutex.h
     include/video_annotator/util/time.h
 )
@@ -61,7 +63,9 @@ set(SOURCES
     src/interface/viewer.cpp
     src/interface/kinect_viewer.cpp
     src/interface/kinect_recorder.cpp
+    src/interface/video_annotator.cpp
     src/interface/opengl_widget.cpp
+    src/data/rgbd_frames.cpp
 )
 
 add_library(video_annotator
@@ -74,5 +78,8 @@ qt5_use_modules(video_annotator Core Gui Widgets OpenGL)
 add_executable(test_freenect src/test_freenect.cpp)
 target_link_libraries(test_freenect video_annotator)
 
-add_executable(video_recorder src/video_recorder.cpp)
-target_link_libraries(video_recorder video_annotator)
+add_executable(recorder src/recorder.cpp)
+target_link_libraries(recorder video_annotator)
+
+add_executable(annotator src/annotator.cpp)
+target_link_libraries(annotator video_annotator)

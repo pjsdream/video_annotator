@@ -72,6 +72,8 @@ void KinectDevice::startRecord(const std::string &filename)
 
     int sizes[2] = {640, 480};
     fwrite((void*)sizes, sizeof(int), 2, file_rgbd_);
+    double scale = 0.0021;
+    fwrite(&scale, sizeof(double), 1, file_rgbd_);
 
     recording_ = true;
     pthread_create(&record_thread_, NULL, &staticRecord, this);

@@ -48,7 +48,9 @@ find_package(Qt5OpenGL REQUIRED)
 # SOURCES
 set(HEADERS
     include/video_annotator/kinect/kinect_device.h
+    include/video_annotator/interface/camera.h
     include/video_annotator/interface/viewer.h
+    include/video_annotator/interface/point_cloud_viewer.h
     include/video_annotator/interface/kinect_viewer.h
     include/video_annotator/interface/kinect_recorder.h
     include/video_annotator/interface/video_annotator.h
@@ -60,7 +62,9 @@ set(HEADERS
 
 set(SOURCES
     src/kinect/kinect_device.cpp
+    src/interface/camera.cpp
     src/interface/viewer.cpp
+    src/interface/point_cloud_viewer.cpp
     src/interface/kinect_viewer.cpp
     src/interface/kinect_recorder.cpp
     src/interface/video_annotator.cpp

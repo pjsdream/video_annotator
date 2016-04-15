@@ -84,6 +84,7 @@ void KinectDevice::finishRecord()
     recording_ = false;
     pthread_join(record_thread_, NULL);
     fclose(file_rgbd_);
+    file_rgbd_ = NULL;
 }
 
 void* KinectDevice::staticRecord(void* object)

@@ -2,7 +2,6 @@
 
 #include <QMouseEvent>
 
-
 namespace video_annotator
 {
 
@@ -102,7 +101,7 @@ void Viewer3DWidget::mouseMoveEvent(QMouseEvent *event)
 {
     const QPoint current_mouse = event->pos();
     const QPoint mouse_move = current_mouse - last_mouse_;
-    const QMouseButtons buttons = event->buttons();
+    const Qt::MouseButtons buttons = event->buttons();
 
     if (buttons == Qt::LeftButton)
     {

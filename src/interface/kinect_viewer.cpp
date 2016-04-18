@@ -41,10 +41,10 @@ void KinectViewerWidget::initializeGL()
 
 void KinectViewerWidget::resizeGL(int w, int h)
 {
-    glViewport(0,0,w,h);
+    glViewport(0, 0, w, h);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    glOrtho (0, 1280, 480, 0, -1.0f, 1.0f);
+    glOrtho(0, 1280, 480, 0, -1.0f, 1.0f);
     glMatrixMode(GL_MODELVIEW);
 }
 
@@ -84,7 +84,7 @@ void KinectViewerWidget::paintGL()
     glEnd();
 
     glBindTexture(GL_TEXTURE_2D, gl_rgb_tex_);
-    if (device_->getVideoFormat() == FREENECT_VIDEO_RGB || device_->getVideoFormat() == FREENECT_VIDEO_YUV_RGB)
+    if (device_->getVideoFormat() == KinectDevice::KINECT_VIDEO_RGB || device_->getVideoFormat() == KinectDevice::KINECT_VIDEO_YUV_RGB)
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 640, 480, 0, GL_RGB, GL_UNSIGNED_BYTE, &rgb[0]);
     else
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, 640, 480, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, &rgb[0]);

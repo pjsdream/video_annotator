@@ -8,6 +8,27 @@
 namespace video_annotator
 {
 
+#ifdef _WIN32 || _WIN64
+KinectDevice::KinectDevice()
+    : buffer_video_(640 * 480 * 3)
+    , buffer_depth_(640 * 480)
+    , new_rgb_frame_(false)
+    , new_depth_frame_(false)
+    , file_rgbd_(NULL)
+{
+    setVideoFormat(KINECT_VIDEO_RGB);
+}
+
+void KinectDevice::setVideoFormat(KinectVideoFormat format)
+{
+    video_format_ = format;
+}
+
+KinectDevice::KinectVideoFormat KinectDevice::getVideoFormat()
+{
+    return video_format_;
+}
+#else
 KinectDevice::KinectDevice(freenect_context *ctx, int index)
     : FreenectDevice(ctx, index)
     , buffer_video_(freenect_find_video_mode(FREENECT_RESOLUTION_MEDIUM, FREENECT_VIDEO_RGB).bytes)
@@ -38,6 +59,7 @@ void KinectDevice::DepthCallback(void* depth, uint32_t timestamp)
     std::copy(depth_cast, depth_cast + getDepthBufferSize() / 2, buffer_depth_.begin());
     new_depth_frame_ = true;
 }
+#endif
 
 bool KinectDevice::getRGBD(std::vector<uint8_t> &rgb, std::vector<uint16_t> &depth) const
 {
@@ -76,13 +98,21 @@ void KinectDevice::startRecord(const std::string &filename)
     fwrite(&scale, sizeof(double), 1, file_rgbd_);
 
     recording_ = true;
+#ifdef _WIN32 || _WIN64
+#else
     pthread_create(&record_thread_, NULL, &staticRecord, this);
+#endif
 }
 
 void KinectDevice::finishRecord()
 {
     recording_ = false;
+
+#ifdef _WIN32 || _WIN64
+#else
     pthread_join(record_thread_, NULL);
+#endif
+
     fclose(file_rgbd_);
     file_rgbd_ = NULL;
 }

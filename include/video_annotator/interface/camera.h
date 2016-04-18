@@ -2,7 +2,7 @@
 #define CAMERA_H
 
 
-#include <Eigen/Dense>
+//#include <Eigen/Dense>
 
 
 namespace video_annotator
@@ -18,8 +18,8 @@ public:
     void translateOnScreen(int x, int y);
     void zoomOnScreen(int x, int y);
 
-    Eigen::Matrix4d projection();
-    Eigen::Matrix4d view();
+    //Eigen::Matrix4d projection();
+    //Eigen::Matrix4d view();
 
 private:
 };

@@ -6,6 +6,7 @@
 #include <vector>
 
 #include <stdio.h>
+#include <stdint.h>
 
 
 namespace video_annotator

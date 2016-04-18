@@ -3,7 +3,12 @@
 
 
 #include <time.h>
-#include <sys/time.h>
+
+#ifdef _WIN32 || _WIN64
+    #include <Windows.h>
+#else
+    #include <sys/time.h>
+#endif
 
 
 namespace video_annotator
@@ -11,6 +16,18 @@ namespace video_annotator
 
 inline double time()
 {
+#ifdef _WIN32 || _WIN64
+    LARGE_INTEGER time,freq;
+    if (!QueryPerformanceFrequency(&freq)){
+        //  Handle error
+        return 0;
+    }
+    if (!QueryPerformanceCounter(&time)){
+        //  Handle error
+        return 0;
+    }
+    return (double)time.QuadPart / freq.QuadPart;
+#else
     struct timeval t;
     if (gettimeofday(&t, NULL))
     {
@@ -18,6 +35,7 @@ inline double time()
         return 0;
     }
     return (double)t.tv_sec + (double)t.tv_usec * .000001;
+#endif
 }
 
 inline void sleep(int sec)

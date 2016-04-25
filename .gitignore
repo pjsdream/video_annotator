@@ -40,3 +40,6 @@ CMakeLists.txt.user.*
 # output
 lib/
 bin/
+
+# big data
+data/

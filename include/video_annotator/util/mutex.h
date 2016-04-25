@@ -2,23 +2,27 @@
 #define MUTEX_H
 
 
-#ifdef _WIN32 || _WIN64
+#ifdef _WIN32
+    #include <QMutex>
 #else
-#include <pthread.h>
+    #include <pthread.h>
 #endif
 
 
 namespace video_annotator
 {
 
-#ifdef _WIN32 || _WIN64
-    class Mutex {
+#ifdef _WIN32
+    class Mutex
+    {
     public:
-        Mutex() {
+        void lock()
+        {
+            mutex_.lock();
         }
-        void lock() {
-        }
-        void unlock() {
+        void unlock()
+        {
+            mutex_.unlock();
         }
 
         class ScopedLock
@@ -37,17 +41,22 @@ namespace video_annotator
         };
 
     private:
+        QMutex mutex_;
     };
 #else
-    class Mutex {
+    class Mutex
+    {
     public:
-        Mutex() {
+        Mutex()
+        {
             pthread_mutex_init( &m_mutex, NULL );
         }
-        void lock() {
+        void lock()
+        {
             pthread_mutex_lock( &m_mutex );
         }
-        void unlock() {
+        void unlock()
+        {
             pthread_mutex_unlock( &m_mutex );
         }
 

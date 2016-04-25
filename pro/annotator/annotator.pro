@@ -6,7 +6,7 @@ DESTDIR = $${PROJECT_DIR}/bin
 HEADERS = \
 
 SOURCES = \
-    $${SOURCES_DIR}/recorder_win.cpp \
+    $${SOURCES_DIR}/annotator_win.cpp \
 
 LIBS += \
     opengl32.lib \

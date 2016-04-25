@@ -9,7 +9,7 @@ int main(int argc, char** argv)
     video_annotator::KinectDevice* device = new video_annotator::KinectDevice();
     video_annotator::KinectRecorderWindow* window = new video_annotator::KinectRecorderWindow(device);
 
-    //window->show();
+    window->show();
     app.exec();
     return 0;
 }

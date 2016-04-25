@@ -4,7 +4,7 @@
 
 #include <time.h>
 
-#ifdef _WIN32 || _WIN64
+#ifdef _WIN32
     #include <Windows.h>
 #else
     #include <sys/time.h>
@@ -16,7 +16,7 @@ namespace video_annotator
 
 inline double time()
 {
-#ifdef _WIN32 || _WIN64
+#ifdef _WIN32
     LARGE_INTEGER time,freq;
     if (!QueryPerformanceFrequency(&freq)){
         //  Handle error

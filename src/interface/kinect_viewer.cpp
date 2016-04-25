@@ -1,5 +1,7 @@
 #include <video_annotator/interface/kinect_viewer.h>
 
+#include <video_annotator/util/time.h>
+
 #include <QTimer>
 
 namespace video_annotator
@@ -22,7 +24,9 @@ void KinectViewerWidget::initializeGL()
 {
     initializeOpenGLFunctions();
 
-    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    printf("OpenGL version: %s\n", glGetString(GL_VERSION));
+
+    glClearColor(0.0f, 1.0f, 0.0f, 0.0f);
     glClearDepth(1.0);
     glDepthFunc(GL_LESS);
     glDisable(GL_DEPTH_TEST);
@@ -50,8 +54,6 @@ void KinectViewerWidget::resizeGL(int w, int h)
 
 void KinectViewerWidget::paintGL()
 {
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
     std::vector<uint8_t> rgb;
     std::vector<uint16_t> depth;
 
@@ -76,7 +78,7 @@ void KinectViewerWidget::paintGL()
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 640, 480, 0, GL_RGB, GL_UNSIGNED_BYTE, &depth_intensity[0]);
 
     glBegin(GL_TRIANGLE_FAN);
-    glColor4f(255.0f, 255.0f, 255.0f, 255.0f);
+    glColor4f(1, 1, 1, 1);
     glTexCoord2f(0, 0); glVertex3f(0,0,0);
     glTexCoord2f(1, 0); glVertex3f(640,0,0);
     glTexCoord2f(1, 1); glVertex3f(640,480,0);
@@ -90,12 +92,19 @@ void KinectViewerWidget::paintGL()
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, 640, 480, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, &rgb[0]);
 
     glBegin(GL_TRIANGLE_FAN);
-    glColor4f(255.0f, 255.0f, 255.0f, 255.0f);
+    glColor4f(1, 1, 1, 1);
     glTexCoord2f(0, 0); glVertex3f(640,0,0);
     glTexCoord2f(1, 0); glVertex3f(1280,0,0);
     glTexCoord2f(1, 1); glVertex3f(1280,480,0);
     glTexCoord2f(0, 1); glVertex3f(640,480,0);
     glEnd();
+
+    // print time
+    static double last = time();
+    double curr = time();
+    printf("%lf\n", (curr - last) * 1000);
+    last = curr;
+    fflush(stdout);
 }
 
 }

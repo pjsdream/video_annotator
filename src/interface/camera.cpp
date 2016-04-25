@@ -20,6 +20,7 @@ void Camera::zoomOnScreen(int x, int y)
 {
 }
 
+/*
 Eigen::Matrix4d Camera::projection()
 {
 }
@@ -27,5 +28,6 @@ Eigen::Matrix4d Camera::projection()
 Eigen::Matrix4d Camera::view()
 {
 }
+*/
 
 }

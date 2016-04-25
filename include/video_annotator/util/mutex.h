@@ -2,42 +2,83 @@
 #define MUTEX_H
 
 
-#include <pthread.h>
+#ifdef _WIN32
+    #include <QMutex>
+#else
+    #include <pthread.h>
+#endif
 
 
 namespace video_annotator
 {
 
-class Mutex {
-public:
-    Mutex() {
-        pthread_mutex_init( &m_mutex, NULL );
-    }
-    void lock() {
-        pthread_mutex_lock( &m_mutex );
-    }
-    void unlock() {
-        pthread_mutex_unlock( &m_mutex );
-    }
-
-    class ScopedLock
+#ifdef _WIN32
+    class Mutex
     {
-        Mutex & _mutex;
     public:
-        ScopedLock(Mutex & mutex)
-            : _mutex(mutex)
+        void lock()
         {
-            _mutex.lock();
+            mutex_.lock();
         }
-        ~ScopedLock()
+        void unlock()
         {
-            _mutex.unlock();
+            mutex_.unlock();
         }
-    };
 
-private:
-    pthread_mutex_t m_mutex;
-};
+        class ScopedLock
+        {
+            Mutex & _mutex;
+        public:
+            ScopedLock(Mutex & mutex)
+                : _mutex(mutex)
+            {
+                _mutex.lock();
+            }
+            ~ScopedLock()
+            {
+                _mutex.unlock();
+            }
+        };
+
+    private:
+        QMutex mutex_;
+    };
+#else
+    class Mutex
+    {
+    public:
+        Mutex()
+        {
+            pthread_mutex_init( &m_mutex, NULL );
+        }
+        void lock()
+        {
+            pthread_mutex_lock( &m_mutex );
+        }
+        void unlock()
+        {
+            pthread_mutex_unlock( &m_mutex );
+        }
+
+        class ScopedLock
+        {
+            Mutex & _mutex;
+        public:
+            ScopedLock(Mutex & mutex)
+                : _mutex(mutex)
+            {
+                _mutex.lock();
+            }
+            ~ScopedLock()
+            {
+                _mutex.unlock();
+            }
+        };
+
+    private:
+        pthread_mutex_t m_mutex;
+    };
+#endif
 
 }
 

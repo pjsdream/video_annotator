@@ -1,5 +1,7 @@
 #include <video_annotator/interface/viewer.h>
 
+#include <video_annotator/util/time.h>
+
 #include <QMouseEvent>
 
 namespace video_annotator
@@ -134,7 +136,8 @@ InteractiveViewerWidget::InteractiveViewerWidget(int fps, QWidget *parent)
     , fps_(fps)
     , timer_(new QTimer(this))
 {
-    timer_->setInterval(1.0 / fps_);
+    timer_->setTimerType(Qt::PreciseTimer);
+    timer_->setInterval(1000.0 / fps_);
     connect(timer_, SIGNAL(timeout()), this, SLOT(update()));
     timer_->start();
 }

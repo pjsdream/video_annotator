@@ -3,13 +3,13 @@
 
 
 #include <QOpenGLWidget>
-#include <QOpenGLFunctions_4_3_Core>
+#include <QOpenGLFunctions_2_1>
 
 
 namespace video_annotator
 {
 
-class OpenGLWidget : public QOpenGLWidget, protected QOpenGLFunctions_4_3_Core
+class OpenGLWidget : public QOpenGLWidget, protected QOpenGLFunctions_2_1
 {
 public:
 

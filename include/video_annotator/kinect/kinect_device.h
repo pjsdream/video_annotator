@@ -110,6 +110,14 @@ namespace video_annotator
     {
     public:
 
+        enum KinectVideoFormat
+        {
+            KINECT_VIDEO_RGB = FREENECT_VIDEO_RGB,
+            KINECT_VIDEO_YUV_RGB = FREENECT_VIDEO_YUV_RGB,
+        };
+
+    public:
+
         KinectDevice(freenect_context *ctx, int index);
 
         /* to convert from image space (i,j,d) to 3d space (x,y,z),

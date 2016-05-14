@@ -46,18 +46,16 @@ void KinectViewerWidget::initializeGL()
 void KinectViewerWidget::resizeGL(int w, int h)
 {
     glViewport(0, 0, w, h);
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glOrtho(0, 1280, 480, 0, -1.0f, 1.0f);
-    glMatrixMode(GL_MODELVIEW);
 }
 
 void KinectViewerWidget::paintGL()
 {
     std::vector<uint8_t> rgb;
     std::vector<uint16_t> depth;
+    std::vector<std::vector<Vector4> > joint_positions;
 
     device_->getRGBD(rgb, depth);
+    device_->getSkeleton(joint_positions);
 
     std::vector<uint8_t> depth_intensity(depth.size() * 3);
 
@@ -70,6 +68,11 @@ void KinectViewerWidget::paintGL()
     }
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glOrtho(0, 1280, 480, 0, -1.0f, 1.0f);
+    glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
     glEnable(GL_TEXTURE_2D);
@@ -97,6 +100,29 @@ void KinectViewerWidget::paintGL()
     glTexCoord2f(1, 0); glVertex3f(1280,0,0);
     glTexCoord2f(1, 1); glVertex3f(1280,480,0);
     glTexCoord2f(0, 1); glVertex3f(640,480,0);
+    glEnd();
+
+    // skeleton
+    glViewport(0, 0, 640, 480);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glOrtho(-1, 1, -1, 1, -1, 1);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+
+    glLineWidth(3.0);
+    glPointSize(5.0);
+    glDisable(GL_TEXTURE_2D);
+    glColor4f(1.0, 1.0, 0.0, 1.0);
+    glBegin(GL_POINTS);
+    for (int i=0; i<joint_positions.size(); i++)
+    {
+        for (int j=0; j<joint_positions[i].size(); j++)
+        {
+            const Vector4& v = joint_positions[i][j];
+            glVertex3f(v.x, v.y, 0.0);
+        }
+    }
     glEnd();
 
     // print time

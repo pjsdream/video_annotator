@@ -64,6 +64,7 @@ namespace video_annotator
         KinectVideoFormat getVideoFormat();
 
         bool getRGBD(std::vector<uint8_t> &rgb, std::vector<uint16_t> &depth);
+        bool getSkeleton(std::vector<std::vector<Vector4> >& skeleton);
 
         void startRecord(const std::string& filename);
         void finishRecord();
@@ -71,11 +72,13 @@ namespace video_annotator
     private:
 
         void reportImageStreamOpenError(HRESULT result);
+        void reportSkeletonTrackingEnableError(HRESULT result);
 
         bool initKinect();
 
         bool getRGB(uint8_t* rgb);
         bool getDepth(uint16_t* depth);
+        bool getSkeletonBuffer(std::vector<std::vector<Vector4> >& skeleton);
 
         void record();
 
@@ -90,12 +93,15 @@ namespace video_annotator
 
         std::vector<uint8_t> buffer_video_;
         std::vector<uint16_t> buffer_depth_;
+        std::vector<std::vector<Vector4> > buffer_joint_positions_;
         mutable Mutex rgb_mutex_;
         mutable Mutex depth_mutex_;
+        mutable Mutex skeleton_mutex_;
         bool new_rgb_frame_;
         bool new_depth_frame_;
 
         FILE* file_rgbd_;
+        FILE* file_skeleton_;
         bool recording_;
         KinectDeviceRecordThread record_thread_;
 

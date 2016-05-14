@@ -44,7 +44,11 @@ bool KinectDevice::initKinect()
     HRESULT result;
 
     // Initialize sensor
-    result = sensor_->NuiInitialize(NUI_INITIALIZE_FLAG_USES_DEPTH | NUI_INITIALIZE_FLAG_USES_COLOR);
+    result = sensor_->NuiInitialize(
+                NUI_INITIALIZE_FLAG_USES_DEPTH
+                | NUI_INITIALIZE_FLAG_USES_COLOR
+                | NUI_INITIALIZE_FLAG_USES_DEPTH_AND_PLAYER_INDEX
+                | NUI_INITIALIZE_FLAG_USES_SKELETON);
     if (result != S_OK)
     {
         fprintf(stderr, "Error: Kinect is not initialized after NuiInitialize().\n");
@@ -75,6 +79,16 @@ bool KinectDevice::initKinect()
     if (result != S_OK)
     {
         reportImageStreamOpenError(result);
+        return false;
+    }
+
+    result = sensor_->NuiSkeletonTrackingEnable(
+        NULL,
+        0     // NUI_SKELETON_TRACKING_FLAG_ENABLE_SEATED_SUPPORT for only upper body
+    );
+    if (result != S_OK)
+    {
+        reportSkeletonTrackingEnableError(result);
         return false;
     }
 
@@ -112,6 +126,32 @@ void KinectDevice::reportImageStreamOpenError(HRESULT result)
 
     default:
         fprintf(stderr, "Error: Unknown error code of NuiImageStreamOpenError.\n");
+        fflush(stderr);
+        break;
+    }
+}
+
+void KinectDevice::reportSkeletonTrackingEnableError(HRESULT result)
+{
+    switch (result)
+    {
+    case ERROR_INVALID_OPERATION:
+        fprintf(stderr, "Error: Kinect is not initialized or is not initialized with the NUI_INITIALIZE_FLAG_USES_SKELETON flag.\n");
+        fflush(stderr);
+        break;
+
+    case E_INVALIDARG:
+        fprintf(stderr, "Error: The value of the dwFlags parameter is NULL.\n");
+        fflush(stderr);
+        break;
+
+    case E_OUTOFMEMORY:
+        fprintf(stderr, "Error: The allocation failed.\n");
+        fflush(stderr);
+        break;
+
+    default:
+        fprintf(stderr, "Error: Unknown error code of NuiSkeletonTrackingEnable.\n");
         fflush(stderr);
         break;
     }
@@ -181,19 +221,70 @@ bool KinectDevice::getDepth(uint16_t* depth)
 
 bool KinectDevice::getRGBD(std::vector<uint8_t> &rgb, std::vector<uint16_t> &depth)
 {
-    getRGB(&buffer_video_[0]);
-    getDepth(&buffer_depth_[0]);
-
     // Copy the vector. Can be slower than swap
     rgb_mutex_.lock();
+    getRGB(&buffer_video_[0]);
     rgb = buffer_video_;
     rgb_mutex_.unlock();
 
     depth_mutex_.lock();
+    getDepth(&buffer_depth_[0]);
     depth = buffer_depth_;
     depth_mutex_.unlock();
 
     return true;
+}
+
+bool KinectDevice::getSkeleton(std::vector<std::vector<Vector4> >& joint_positions)
+{
+    skeleton_mutex_.lock();
+    joint_positions = buffer_joint_positions_;
+    if (getSkeletonBuffer(buffer_joint_positions_))
+        joint_positions = buffer_joint_positions_;
+    skeleton_mutex_.unlock();
+
+    return true;
+}
+
+bool KinectDevice::getSkeletonBuffer(std::vector<std::vector<Vector4> >& joint_positions)
+{
+    joint_positions.clear();
+
+    NUI_SKELETON_FRAME skeletonFrame = {0};
+    if (!initialized_ || sensor_->NuiSkeletonGetNextFrame(0, &skeletonFrame) >= 0)
+    {
+        sensor_->NuiTransformSmooth(&skeletonFrame, NULL);
+
+        // Loop over all sensed skeletons
+        for (int z = 0; z < NUI_SKELETON_COUNT; ++z)
+        {
+            const NUI_SKELETON_DATA& skeleton = skeletonFrame.SkeletonData[z];
+            // Check the state of the skeleton
+            if (skeleton.eTrackingState == NUI_SKELETON_TRACKED)
+            {
+                std::vector<Vector4> joint_position(20);
+
+                // Copy the joint positions into our array
+                for (int i = 0; i < NUI_SKELETON_POSITION_COUNT; ++i)
+                {
+                    joint_position[i] = skeleton.SkeletonPositions[i];
+                    if (skeleton.eSkeletonPositionTrackingState[i] == NUI_SKELETON_POSITION_NOT_TRACKED)
+                    {
+                        joint_position[i].w = 0.;
+                    }
+
+                    //printf("%d %d %lf %lf %lf %lfa\n", z, i, v.x, v.y, v.z, v.w);
+                    //fflush(stdout);
+                }
+
+                joint_positions.push_back(joint_position);
+            }
+        }
+
+        return true;
+    }
+
+    return false;
 }
 #else
 KinectDevice::KinectDevice(freenect_context *ctx, int index)
@@ -253,6 +344,22 @@ void KinectDevice::startRecord(const std::string &filename)
         throw std::string("Unable to access file \"") + filename + std::string("\".\n") +
                 std::string("Permission denied?");
     }
+    // skeleton
+    const int period = filename.find_last_of('.');
+    const int directory = filename.find_last_of("/\\");
+    std::string filename_skeleton;
+    if (period == std::string::npos || (directory != std::string::npos && period < directory))
+        filename_skeleton = filename + ".skel";
+    else
+        filename_skeleton = filename.substr(0, period) + ".skel";
+
+    file_skeleton_ = fopen(filename_skeleton.c_str(), "w");
+    if (file_skeleton_ == NULL)
+    {
+        throw std::string("Unable to access file \"") + filename_skeleton + std::string("\".\n") +
+                std::string("Permission denied?");
+    }
+
     recording_ = true;
 
     int sizes[2] = {640, 480};
@@ -279,6 +386,9 @@ void KinectDevice::finishRecord()
 
     fclose(file_rgbd_);
     file_rgbd_ = NULL;
+
+    fclose(file_skeleton_);
+    file_skeleton_ = NULL;
 }
 
 #ifdef _WIN32
@@ -304,6 +414,7 @@ void KinectDevice::record()
 
     std::vector<uint8_t> rgb;
     std::vector<uint16_t> depth;
+    std::vector<std::vector<Vector4> > skeleton;
 
     while (recording_)
     {
@@ -311,20 +422,30 @@ void KinectDevice::record()
 
         if (getRGBD(rgb, depth))
         {
-            rgb_mutex_.lock();
-            rgb = buffer_video_;
-            rgb_mutex_.unlock();
-
-            depth_mutex_.lock();
-            depth = buffer_depth_;
-            depth_mutex_.unlock();
-
             fwrite((void*)&rgb[0], sizeof(rgb[0]), rgb.size(), file_rgbd_);
             fwrite((void*)&depth[0], sizeof(depth[0]), depth.size(), file_rgbd_);
         }
         else
         {
-            printf("No data available!");
+            printf("No RGBD data available!");
+        }
+
+        if (getSkeleton(skeleton))
+        {
+            fprintf(file_skeleton_, "%d\n", skeleton.size());
+            for (int i=0; i<skeleton.size(); i++)
+            {
+                for (int j=0; j<skeleton[i].size(); j++)
+                    fprintf(file_skeleton_, "%lf %lf %lf %lf\n",
+                            skeleton[i][j].x,
+                            skeleton[i][j].y,
+                            skeleton[i][j].z,
+                            skeleton[i][j].w);
+            }
+        }
+        else
+        {
+            printf("No skeletal data available!");
         }
 
         printf("\n");

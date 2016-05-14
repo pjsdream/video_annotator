@@ -14,6 +14,7 @@ HEADERS = \
     $${INCLUDE_DIR}/video_annotator/interface/video_annotator.h \
     $${INCLUDE_DIR}/video_annotator/interface/opengl_widget.h \
     $${INCLUDE_DIR}/video_annotator/data/rgbd_frames.h \
+    $${INCLUDE_DIR}/video_annotator/data/skeleton_frames.h \
     $${INCLUDE_DIR}/video_annotator/util/mutex.h \
     $${INCLUDE_DIR}/video_annotator/util/time.h \
 
@@ -27,6 +28,7 @@ SOURCES = \
     $${SOURCES_DIR}/interface/video_annotator.cpp \
     $${SOURCES_DIR}/interface/opengl_widget.cpp \
     $${SOURCES_DIR}/data/rgbd_frames.cpp \
+    $${SOURCES_DIR}/data/skeleton_frames.cpp \
 
 LIBS += \
     opengl32.lib \

@@ -29,10 +29,13 @@ public slots:
 
     void updateRGBImage(const std::vector<uint8_t>& rgb);
     void updateDepthImage(const std::vector<uint16_t>& depth);
+    void updatePoints(const std::vector<double>& points);
 
 private:
 
     GLuint gl_tex_;
+
+    std::vector<double> points_;
 };
 
 

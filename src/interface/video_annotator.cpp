@@ -111,9 +111,11 @@ void VideoAnnotatorWindow::openOpenDialog()
 void VideoAnnotatorWindow::load(const std::string& filename)
 {
     rgbd_filename_ = filename;
+    skeleton_filename_ = rgbd_filename_.substr(0, rgbd_filename_.length() - 4) + ".skel";
     annotation_filename_ = rgbd_filename_.substr(0, rgbd_filename_.length() - 4) + "_annotation.txt";
 
     frames_.load(rgbd_filename_);
+    skeleton_frames_.load(skeleton_filename_);
     emit numFramesChanged(frames_.numFrames());
     updateFrame(0);
 }
@@ -124,7 +126,9 @@ void VideoAnnotatorWindow::updateFrame(int frame)
 
     std::vector<uint8_t> rgb;
     std::vector<uint16_t> depth;
+    std::vector<std::vector<double> > skeleton;
     frames_.getRGBD(frame, rgb, depth);
+    skeleton_frames_.getSkeleton(frame, skeleton);
 
     switch (view_mode_)
     {
@@ -136,6 +140,22 @@ void VideoAnnotatorWindow::updateFrame(int frame)
         widget_viewer_->updateDepthImage(depth);
         break;
     }
+
+    std::vector<double> points;
+    for (int i=0; i<skeleton.size(); i++)
+    {
+        for (int j=0; j<skeleton[i].size(); j+=4)
+        {
+            points.push_back(skeleton[i][j]);
+            points.push_back(skeleton[i][j+1]);
+        }
+    }
+
+    for (int i=0; i<points.size(); i+=2)
+        printf("%lf %lf\n", points[i], points[i+1]);
+    fflush(stdout);
+
+    widget_viewer_->updatePoints(points);
 }
 
 void VideoAnnotatorWindow::viewRGB()

@@ -42,6 +42,10 @@ void ImageViewerWidget::resizeGL(int w, int h)
 void ImageViewerWidget::paintGL()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glOrtho (0, 640, 480, 0, -1.0f, 1.0f);
+    glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
     glEnable(GL_TEXTURE_2D);
@@ -53,6 +57,21 @@ void ImageViewerWidget::paintGL()
     glTexCoord2f(1, 0); glVertex3f(640,0,0);
     glTexCoord2f(1, 1); glVertex3f(640,480,0);
     glTexCoord2f(0, 1); glVertex3f(0,480,0);
+    glEnd();
+
+    // points
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glOrtho(-1, 1, -1, 1, -1, 1);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+
+    glPointSize(3.0);
+    glDisable(GL_TEXTURE_2D);
+    glColor4f(1, 1, 0, 1);
+    glBegin(GL_POINTS);
+    for (int i=0; i<points_.size(); i+=2)
+        glVertex2f(points_[i], points_[i+1]);
     glEnd();
 }
 
@@ -85,6 +104,11 @@ void ImageViewerWidget::updateDepthImage(const std::vector<uint16_t>& depth)
 
     doneCurrent();
     update();
+}
+
+void ImageViewerWidget::updatePoints(const std::vector<double>& points)
+{
+    points_ = points;
 }
 
 

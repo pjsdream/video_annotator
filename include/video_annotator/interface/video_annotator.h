@@ -9,6 +9,7 @@
 #include <QIntValidator>
 
 #include <video_annotator/data/rgbd_frames.h>
+#include <video_annotator/data/skeleton_frames.h>
 #include <video_annotator/interface/viewer.h>
 #include <video_annotator/interface/point_cloud_viewer.h>
 
@@ -79,12 +80,14 @@ protected slots:
 private:
 
     std::string rgbd_filename_;
+    std::string skeleton_filename_;
     std::string annotation_filename_;
 
     ViewMode view_mode_;
     int current_frame_;
 
     RGBDFrames frames_;
+    SkeletonFrames skeleton_frames_;
     ImageViewerWidget* widget_viewer_;
     PointCloudViewerWidget* widget_pointcloud_viewer_;
     TimeBar* time_bar_;
